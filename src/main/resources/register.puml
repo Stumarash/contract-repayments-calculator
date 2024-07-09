@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+left to right direction
+:user: as User
+
+rectangle contract-repayment-calculator{
+    User ---> (Register)
+    User ---> (Login)
+    User ---> (Calculate contract repayment)
+
+
+
+    note right of (Calculate contract repayment)
+    Three options to calculate from are
+    12, 24 and 36 months
+    offer with an interest rate of 6.5%.
+    end note
+}
+@enduml

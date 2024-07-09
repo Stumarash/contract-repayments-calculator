@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: contract-repayments-calculator - OpenAPI 3.0
+  description: |-
+    The system allows users to register/login into a system and allows the user to calculate
+    contract repayments for devices taken over the following periods 12, 24 and 36 months.  The user will be able to enter the device amount and be shown the different offerings based on the amount over the 3 periods on offer with an interest rate of 6.5%.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: ContractRepaymentsCalc
+    description: service to calculate contract repayments
+paths:
+  /register:
+    post:
+      tags:
+        - ContractRepaymentsCalc
+      summary: Add new user
+      description: add new user to the db
+      operationId: registration
+      requestBody:
+        description: Create a new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDetails'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDetails'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+
+  /results:
+    post:
+      tags:
+        - ContractRepaymentsCalc
+      summary: Calculate contract repayments
+      description: Return a list of payment options
+      operationId: getPaymentOptions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceDetails'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDetails'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+
+components:
+  schemas:
+    CustomerDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          example: name
+        surname:
+          type: string
+          example: surname
+        password:
+          type: string
+          example: password
+        email:
+          type: string
+          example: mail@email.com
+    DeviceDetails:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 1.1
+        monthlyPayments:
+          type: number
+          format: double
+          example: 1.2
+        total:
+          type: number
+          format: double
+          example: 1.2
+        paymentPeriod:
+          $ref: '#/components/schemas/PaymentPeriods'
+    PaymentPeriods:
+      type: string
+      enum:
+        - TWELVE_MONTHS_PERIOD
+        - TWENTY_FOUR_MONTHS_PERIOD
+        - THIRTY_SIX_MONTHS_PERIOD
