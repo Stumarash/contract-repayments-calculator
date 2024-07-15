@@ -43,7 +43,7 @@ public class ContractRepaymentsController {
     @Operation(summary = "Method to calculate contract payment options")
     @PostMapping("/results")
     public String paymentsOption(Model model, @ModelAttribute("deviceDetails") DeviceDetails deviceDetails) {
-        List<DeviceDetails> deviceDetailsResults = null;
+        List<DeviceDetails> deviceDetailsResults;
         try {
             deviceDetailsResults = repaymentsCalculator.calculateDevicePayment(deviceDetails);
         } catch (JsonProcessingException e) {
