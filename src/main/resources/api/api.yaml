@@ -1,103 +1,192 @@
 openapi: 3.0.3
 info:
-  title: contract-repayments-calculator - OpenAPI 3.0
-  description: |-
-    The system allows users to register/login into a system and allows the user to calculate
-    contract repayments for devices taken over the following periods 12, 24 and 36 months.  The user will be able to enter the device amount and be shown the different offerings based on the amount over the 3 periods on offer with an interest rate of 6.5%.
+  title: Contract Repayments Calculator API
+  description: API for calculating device contract repayments with various payment terms
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/
+  - url: http://localhost:8080
+    description: Local development server
+
 tags:
-  - name: ContractRepaymentsCalc
-    description: service to calculate contract repayments
+  - name: Contract Repayments Calculator
+    description: Operations for contract repayment calculations and user management
+
 paths:
-  /register:
-    post:
+  /api/v1/contracts:
+    get:
       tags:
-        - ContractRepaymentsCalc
-      summary: Add new user
-      description: add new user to the db
-      operationId: registration
-      requestBody:
-        description: Create a new user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CustomerDetails'
-        required: true
+        - Contract Repayments Calculator
+      summary: Show calculator web interface
+      description: Returns the calculator web interface
+      operationId: showCalculator
       responses:
         '200':
-          description: Successful operation
+          description: Calculator page successfully returned
           content:
-            application/json:
+            text/html:
               schema:
-                $ref: '#/components/schemas/CustomerDetails'
-        '400':
-          description: Invalid input
-        '422':
-          description: Validation exception
+                type: string
 
-  /results:
+  /api/v1/contracts/calculate:
     post:
       tags:
-        - ContractRepaymentsCalc
-      summary: Calculate contract repayments
-      description: Return a list of payment options
-      operationId: getPaymentOptions
+        - Contract Repayments Calculator
+      summary: Calculate repayments from web form
+      description: Process device details and calculate repayments
+      operationId: calculateResults
       requestBody:
+        required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/DeviceDetails'
       responses:
         '200':
-          description: successful operation
+          description: Calculation successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeviceDetails'
+                type: string
         '400':
-          description: Invalid input
-        '422':
-          description: Validation exception
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /api/v1/contracts/repayments:
+    get:
+      tags:
+        - Contract Repayments Calculator
+      summary: Calculate device repayment options
+      description: Calculates monthly repayments for a device over 12, 24, and 36 month periods with 6.5% interest
+      operationId: calculateRepayments
+      parameters:
+        - name: amount
+          in: query
+          required: true
+          description: Device amount to finance
+          schema:
+            type: number
+            format: double
+            minimum: 0.01
+            example: 1000.00
+      responses:
+        '200':
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentResult'
+        '400':
+          description: Invalid amount provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/contracts/users:
+    post:
+      tags:
+        - Contract Repayments Calculator
+      summary: Register new user
+      description: Register a new user in the system
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDetails'
+      responses:
+        '200':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid user details provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
-    CustomerDetails:
-      type: object
-      properties:
-        name:
-          type: string
-          example: name
-        surname:
-          type: string
-          example: surname
-        password:
-          type: string
-          example: password
-        email:
-          type: string
-          example: mail@email.com
     DeviceDetails:
       type: object
+      required:
+        - amount
       properties:
         amount:
           type: number
           format: double
-          example: 1.1
+          example: 1000.00
+          description: Device amount to finance
+
+    CustomerDetails:
+      type: object
+      required:
+        - email
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          example: John Doe
+
+    PaymentResult:
+      type: object
+      properties:
+        paymentPeriods:
+          type: integer
+          enum: [12, 24, 36]
+          example: 12
+          description: Number of months for repayment
         monthlyPayments:
           type: number
           format: double
-          example: 1.2
-        total:
-          type: number
-          format: double
-          example: 1.2
-        paymentPeriod:
-          $ref: '#/components/schemas/PaymentPeriods'
-    PaymentPeriods:
-      type: string
-      enum:
-        - TWELVE_MONTHS_PERIOD
-        - TWENTY_FOUR_MONTHS_PERIOD
-        - THIRTY_SIX_MONTHS_PERIOD
+          example: 87.50
+          description: Monthly payment amount
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Error message
+        timestamp:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+security:
+  - basicAuth: []

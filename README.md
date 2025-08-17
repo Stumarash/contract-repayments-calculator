@@ -55,16 +55,53 @@ For complete project information, see [projectlombok.org]
 
 ## How to get started
 
-Clone project and run mvn clean install, if you don't have maven installed in your local machine you can use the one bundled with the project.
+### Local Development
+1. Clone project and run mvn clean install, if you don't have maven installed in your local machine you can use the one bundled with the project.
 
-Build the project: mvn clean install
+2. Build the project: `mvn clean install`
+3. Run the application: `mvn spring-boot:run`
+4. Start project: It will use the default profile as well the default port 8080
+5. Enter http://localhost:8080/index on your browser -> got to the registration page and create a user, after you have successfully created a user, go back to login screen to sign-in
+6. After you have successfully signed-in then you should be redirected to the calculator page to be able to calculate possible monthly repayments
 
-Run the application: mvn spring-boot:run
+### Kubernetes Deployment
 
-Start project : It will use the default profile as well the default port 8080
+### Prerequisites
 
-Enter http://localhost:8080/index on your browser -> got to the registration page and create a user, after you have successfully created a user, go back to login screen to sign-in
+Prerequisites:
+- Kubernetes cluster
+- Helm 3.x installed
+- kubectl configured with cluster access
 
-After you have successfully signed-in then you should be redirected to the calculator page to be able to calculate possible monthly repayments
-
+Deployment steps:
+1. Navigate to the helm-charts directory
+2. Install the chart:
+   ```bash
+   helm install calculator .
+   ```
+3. To customize the installation, create a values.yaml file with your configurations and run:
+   ```bash
+   helm install calculator . -f your-values.yaml
+   ```
 Click here [Test Coverage Report] to see test coverage report
+
+## Kubernetes Deployment
+
+### Prerequisites
+- Kubernetes cluster
+- Helm 3.x installed
+- kubectl configured with cluster access
+
+### Deploy using Helm
+
+1. Install the Helm chart:
+```bash
+helm install calculator ./helm-charts
+```
+
+2. Access the application:
+```bash
+kubectl port-forward svc/calculator 8080:8080
+```
+
+For custom configuration, create a values.yaml file and use: `helm install calculator ./helm-charts -f values.yaml`

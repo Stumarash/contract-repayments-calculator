@@ -24,7 +24,6 @@ public class RoleEntity extends AbstractBaseEntity implements Serializable {
     @Column(nullable = false, unique = true)
     private String name;
 
-    //mapped by is a keyword to let know compiler that there is a bidirectional mapping between user and role entities.
     @ManyToMany(mappedBy = "roles")
     private List<CustomerDetailsEntity> user = new ArrayList<>();
 }

@@ -1,6 +1,7 @@
 package com.contact.calculator.model.domain;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.io.Serial;
@@ -19,7 +20,8 @@ public class CustomerDetails extends AbstractBaseDomain implements Serializable 
     private String name;
     private String surname;
     private String password;
-    @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
+    @Email(message = "Please provide a valid email")
+    @NotBlank(message = "Email is required")
     private String email;
 
 }

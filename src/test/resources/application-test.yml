@@ -1,0 +1,6 @@
+calculator:
+  interest-rate: 6.5
+  terms:
+    - 12
+    - 24
+    - 36

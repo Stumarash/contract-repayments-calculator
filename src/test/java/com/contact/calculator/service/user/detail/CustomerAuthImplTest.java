@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -35,7 +36,7 @@ class CustomerAuthImplTest {
                         .surname("surname")
                         .email("email@gmail.com")
                         .password("password")
-                        .roles(Arrays.asList(RoleEntity.builder()
+                        .roles(Collections.singletonList(RoleEntity.builder()
                                 .name("USER")
                                 .build()))
                         .build());

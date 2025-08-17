@@ -1,29 +1,14 @@
 package com.contact.calculator.model.domain;
 
-import com.contact.calculator.model.PaymentPeriods;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class DeviceDetails implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    @NotNull
+@NoArgsConstructor
+public class DeviceDetails {
+    @Positive(message = "Amount must be greater than zero")
     private double amount;
-    private double monthlyPayments;
-    private PaymentPeriods paymentPeriods;
-
-    private double total = 0;
-
 }

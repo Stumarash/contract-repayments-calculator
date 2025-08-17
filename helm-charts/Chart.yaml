@@ -1,0 +1,4 @@
+apiVersion: v2
+name: contract-repayments-calculator
+description: Helm chart for Contract Repayments Calculator
+version: 0.1.0

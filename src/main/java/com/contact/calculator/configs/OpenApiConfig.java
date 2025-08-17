@@ -1,8 +1,11 @@
 package com.contact.calculator.configs;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import org.springdoc.core.GroupedOpenApi;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,17 +15,26 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Contract Calculator API")
-                        .version("1.0.0")
-                        .description("API documentation for Contract Calculator"));
+                .info(new Info()
+                    .title("Contract Repayments Calculator API")
+                    .version("1.0.0")
+                    .description("""
+                        API for calculating device contract repayments with the following features:
+                        * User registration and authentication
+                        * Device repayment calculations over 12, 24, and 36 months
+                        * Fixed interest rate of 6.5%
+                        * Secure endpoints with Basic Authentication
+                        """)
+                    .contact(new Contact()
+                        .name("API Support")
+                        .email("support@example.com"))
+                    .license(new License()
+                        .name("Apache 2.0")
+                        .url("http://www.apache.org/licenses/LICENSE-2.0.html")))
+                .components(new Components()
+                    .addSecuritySchemes("basic", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("basic")
+                        .description("Basic authentication with username and password")));
     }
-
-    @Bean
-    public GroupedOpenApi publicApi() {
-        return GroupedOpenApi.builder()
-                .group("public")
-                .pathsToMatch("/**")
-                .build();
-    }
-
 }

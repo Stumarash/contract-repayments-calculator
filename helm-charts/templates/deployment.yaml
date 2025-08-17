@@ -1,0 +1,62 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springBoot.profile }}
+            - name: JAVA_OPTS
+              value: {{ .Values.springBoot.javaOpts }}
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:h2:file:{{ .Values.h2Database.path }}/{{ .Values.h2Database.config.dbName }}"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.h2Database.config.username }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.h2Database.config.password }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: h2-data
+              mountPath: {{ .Values.h2Database.path }}
+      volumes:
+        - name: h2-data
+          {{- if .Values.h2Database.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-h2-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
