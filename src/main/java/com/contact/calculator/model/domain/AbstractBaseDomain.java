@@ -15,17 +15,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class AbstractBaseDomain implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private Long lockVersion;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    protected AbstractBaseDomain(AbstractBaseDomain abstractBaseDomain) {
-        this.id = abstractBaseDomain.getId();
-        this.lockVersion = abstractBaseDomain.getLockVersion();
-        this.created = abstractBaseDomain.getCreated();
-        this.updated = abstractBaseDomain.updated;
-    }
+	private Long id;
+
+	private Long lockVersion;
+
+	private LocalDateTime created;
+
+	private LocalDateTime updated;
+
+	protected AbstractBaseDomain(AbstractBaseDomain abstractBaseDomain) {
+		this.id = abstractBaseDomain.getId();
+		this.lockVersion = abstractBaseDomain.getLockVersion();
+		this.created = abstractBaseDomain.getCreated();
+		this.updated = abstractBaseDomain.updated;
+	}
+
 }

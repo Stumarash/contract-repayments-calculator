@@ -5,9 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,42 +22,48 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
-    @Bean
-    public static PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public static PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder())
-                .and()
-                .build();
-    }
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return new ProviderManager(authProvider);
+	}
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers(HttpMethod.POST, "/api/v1/contracts/users").permitAll()
-                .requestMatchers("/swagger-ui.html", "/api-docs/**", "/swagger-ui/**",
-                               "/swagger-resources/**", "/webjars/**").permitAll()
-                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/**").permitAll()
-                // Protected endpoints
-//                .requestMatchers("/api/v1/contracts/**").authenticated()
-//                .anyRequest().authenticated()
-            )
-            .httpBasic();  // Using HTTP Basic auth for simplicity, in production consider using JWT
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		return http.csrf(AbstractHttpConfigurer::disable)
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+			.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/register")
+				.permitAll()
+				.requestMatchers("/swagger-ui.html", "/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+						"/webjars/**")
+				.permitAll()
+				.requestMatchers("/actuator/health", "/actuator/info")
+				.permitAll()
+				.requestMatchers("/h2-console/**")
+				.permitAll()
+				.requestMatchers("/", "/calculator", "/register", "/login", "/calculate")
+				.permitAll()
+				.requestMatchers("/api/v1/contracts/**")
+				.permitAll()
+				.requestMatchers("/css/**", "/js/**", "/images/**")
+				.permitAll()
+				.anyRequest()
+				.authenticated())
+			.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/calculator", true).permitAll())
+			.logout(logout -> logout.logoutSuccessUrl("/login").permitAll())
+			.httpBasic(httpBasic -> {
+			})
+			.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+			.build();
+	}
 
-        return http.build();
-    }
 }

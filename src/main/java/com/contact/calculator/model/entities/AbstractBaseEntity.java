@@ -19,29 +19,30 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class AbstractBaseEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(name = "lock_version", columnDefinition = "BIGINT NOT NULL DEFAULT 0")
-    @Version
-    private Long lockVersion;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "created", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
-    private LocalDateTime created;
+	@Column(name = "lock_version", columnDefinition = "BIGINT NOT NULL DEFAULT 0")
+	@Version
+	private Long lockVersion;
 
-    @Column(name = "updated", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    @UpdateTimestamp
-    private LocalDateTime updated;
+	@Column(name = "created", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+	@CreationTimestamp
+	private LocalDateTime created;
 
-    protected AbstractBaseEntity(AbstractBaseEntity abstractBaseEntity) {
-        this.id = abstractBaseEntity.getId();
-        this.lockVersion = abstractBaseEntity.getLockVersion();
-        this.created = abstractBaseEntity.getCreated();
-        this.updated = abstractBaseEntity.updated;
-    }
+	@Column(name = "updated", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+	@UpdateTimestamp
+	private LocalDateTime updated;
+
+	protected AbstractBaseEntity(AbstractBaseEntity abstractBaseEntity) {
+		this.id = abstractBaseEntity.getId();
+		this.lockVersion = abstractBaseEntity.getLockVersion();
+		this.created = abstractBaseEntity.getCreated();
+		this.updated = abstractBaseEntity.updated;
+	}
 
 }

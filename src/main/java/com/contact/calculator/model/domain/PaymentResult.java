@@ -7,7 +7,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PaymentResult {
-    private int paymentPeriods;
-    private double monthlyPayments;
-    private double total;
+
+	private int paymentPeriods;
+
+	private double monthlyPayments;
+
+	private double total;
+
 }

@@ -23,45 +23,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ContractRepaymentsCalculatorApplicationTests {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockBean
-    private CalculatorService calculatorService;
+	@MockBean
+	private CalculatorService calculatorService;
 
-    @Test
-    void contextLoads() {
-    }
+	@Test
+	void contextLoads() {
+	}
 
-    @Test
-    @WithMockUser
-    void fullCalculationFlow_Success() throws Exception {
-        // Given
-        double amount = 1000.00;
-        List<PaymentResult> expectedResults = Arrays.asList(
-                PaymentResult.builder()
-                        .paymentPeriods(12)
-                        .monthlyPayments(87.50)
-                        .build(),
-                PaymentResult.builder()
-                        .paymentPeriods(24)
-                        .monthlyPayments(45.83)
-                        .build(),
-                PaymentResult.builder()
-                        .paymentPeriods(36)
-                        .monthlyPayments(31.94)
-                        .build()
-        );
+	@Test
+	@WithMockUser
+	void fullCalculationFlow_Success() throws Exception {
+		// Given
+		double amount = 1000.00;
+		List<PaymentResult> expectedResults = Arrays.asList(
+				PaymentResult.builder().paymentPeriods(12).monthlyPayments(87.50).build(),
+				PaymentResult.builder().paymentPeriods(24).monthlyPayments(45.83).build(),
+				PaymentResult.builder().paymentPeriods(36).monthlyPayments(31.94).build());
 
-        when(calculatorService.calculatePayments(anyDouble()))
-                .thenReturn(expectedResults);
+		when(calculatorService.calculatePayments(anyDouble())).thenReturn(expectedResults);
 
-        // When & Then
-        mockMvc.perform(get("/api/v1/contracts/repayments")
-                        .param("amount", String.valueOf(amount)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].paymentPeriods").value(12))
-                .andExpect(jsonPath("$[0].monthlyPayments").value(87.50));
-    }
+		// When & Then
+		mockMvc.perform(get("/api/v1/contracts/repayments").param("amount", String.valueOf(amount)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").isArray())
+			.andExpect(jsonPath("$[0].paymentPeriods").value(12))
+			.andExpect(jsonPath("$[0].monthlyPayments").value(87.50));
+	}
+
 }

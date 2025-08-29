@@ -2,6 +2,7 @@ package com.contact.calculator.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -10,12 +11,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class TestSecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated()
-                ).httpBasic();
-        return http.build();
-    }
+	@Bean
+	@Primary
+	public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+		return http.csrf(csrf -> csrf.disable())
+			.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+			.httpBasic(httpBasic -> {
+			})
+			.build();
+	}
+
 }

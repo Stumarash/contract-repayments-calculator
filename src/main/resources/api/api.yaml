@@ -1,23 +1,56 @@
 openapi: 3.0.3
 info:
   title: Contract Repayments Calculator API
-  description: API for calculating device contract repayments with various payment terms
-  version: 1.0.0
+  description: |
+    Modern web application for calculating device contract repayments with user authentication.
+    
+    Features:
+    - Calculate monthly repayments for 12, 24, and 36-month contracts
+    - 6.5% interest rate
+    - User registration and authentication
+    - Mobile-responsive web interface
+    - REST API endpoints
+  version: 2.0.0
+  contact:
+    name: Contract Calculator Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
 servers:
   - url: http://localhost:8080
     description: Local development server
 
 tags:
-  - name: Contract Repayments Calculator
-    description: Operations for contract repayment calculations and user management
+  - name: Web Interface
+    description: Web MVC endpoints for user interface
+  - name: REST API
+    description: REST API endpoints for programmatic access
 
 paths:
-  /api/v1/contracts:
+  # Web MVC Endpoints
+  /:
     get:
       tags:
-        - Contract Repayments Calculator
-      summary: Show calculator web interface
-      description: Returns the calculator web interface
+        - Web Interface
+      summary: Root redirect
+      description: Redirects to the calculator page
+      operationId: redirectToCalculator
+      responses:
+        '302':
+          description: Redirect to calculator
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /calculator
+
+  /calculator:
+    get:
+      tags:
+        - Web Interface
+      summary: Show calculator page
+      description: Returns the main calculator web interface
       operationId: showCalculator
       responses:
         '200':
@@ -26,47 +59,71 @@ paths:
             text/html:
               schema:
                 type: string
+                description: HTML page with calculator form
 
-  /api/v1/contracts/calculate:
+  /login:
+    get:
+      tags:
+        - Web Interface
+      summary: Show login page
+      description: Returns the login form
+      operationId: showLogin
+      responses:
+        '200':
+          description: Login page successfully returned
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /register:
+    get:
+      tags:
+        - Web Interface
+      summary: Show registration page
+      description: Returns the user registration form
+      operationId: showRegister
+      responses:
+        '200':
+          description: Registration page successfully returned
+          content:
+            text/html:
+              schema:
+                type: string
     post:
       tags:
-        - Contract Repayments Calculator
-      summary: Calculate repayments from web form
-      description: Process device details and calculate repayments
-      operationId: calculateResults
+        - Web Interface
+      summary: Register new user (Web Form)
+      description: Process user registration from web form
+      operationId: registerUserWeb
       requestBody:
         required: true
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/DeviceDetails'
+              $ref: '#/components/schemas/CustomerDetails'
       responses:
         '200':
-          description: Calculation successful
+          description: Registration processed (success or error page)
           content:
-            application/json:
+            text/html:
               schema:
                 type: string
-        '400':
-          description: Invalid input parameters
-          content:
-            application/json:
+        '302':
+          description: Redirect to login page on success
+          headers:
+            Location:
               schema:
                 type: string
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: string
+                example: /login
 
-  /api/v1/contracts/repayments:
+  /calculate:
     get:
       tags:
-        - Contract Repayments Calculator
-      summary: Calculate device repayment options
-      description: Calculates monthly repayments for a device over 12, 24, and 36 month periods with 6.5% interest
-      operationId: calculateRepayments
+        - Web Interface
+      summary: Calculate repayments (Web)
+      description: Calculate repayments and show results page
+      operationId: calculateResultsWeb
       parameters:
         - name: amount
           in: query
@@ -75,8 +132,49 @@ paths:
           schema:
             type: number
             format: double
-            minimum: 0.01
-            example: 1000.00
+            minimum: 100
+            maximum: 100000
+            example: 15000.00
+      responses:
+        '200':
+          description: Results page with calculations
+          content:
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: Invalid amount - returns calculator page with error
+          content:
+            text/html:
+              schema:
+                type: string
+
+  # REST API Endpoints
+  /api/v1/contracts/repayments:
+    get:
+      tags:
+        - REST API
+      summary: Calculate device repayment options
+      description: |
+        Calculates monthly repayments for a device over 12, 24, and 36 month periods.
+        
+        **Interest Rate:** 6.5% per annum
+        
+        **Payment Terms:** 12, 24, 36 months
+        
+        **Amount Range:** R100 - R100,000
+      operationId: calculateRepayments
+      parameters:
+        - name: amount
+          in: query
+          required: true
+          description: Device amount to finance (ZAR)
+          schema:
+            type: number
+            format: double
+            minimum: 1
+            maximum: 100000
+            example: 15000.00
       responses:
         '200':
           description: Successful calculation
@@ -86,12 +184,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaymentResult'
+              example:
+                - paymentPeriods: 12
+                  monthlyPayments: 1312.50
+                  totalPayment: 15750.00
+                - paymentPeriods: 24
+                  monthlyPayments: 687.50
+                  totalPayment: 16500.00
+                - paymentPeriods: 36
+                  monthlyPayments: 479.17
+                  totalPayment: 17250.00
         '400':
           description: Invalid amount provided
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Amount must be greater than 0"
+                timestamp: "2024-01-15T10:30:00Z"
         '500':
           description: Internal server error
           content:
@@ -99,34 +210,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/contracts/users:
+  /api/v1/contracts/register:
     post:
       tags:
-        - Contract Repayments Calculator
-      summary: Register new user
-      description: Register a new user in the system
-      operationId: registerUser
+        - REST API
+      summary: Register new user (API)
+      description: Register a new user via REST API
+      operationId: registerUserApi
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CustomerDetails'
+            example:
+              name: "John Doe"
+              email: "john.doe@example.com"
       responses:
-        '200':
+        '201':
           description: User successfully registered
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User registered successfully"
         '400':
-          description: Invalid user details provided
+          description: Invalid user details or email already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: User already exists
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email already registered"
+        '500':
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -134,17 +256,6 @@ paths:
 
 components:
   schemas:
-    DeviceDetails:
-      type: object
-      required:
-        - amount
-      properties:
-        amount:
-          type: number
-          format: double
-          example: 1000.00
-          description: Device amount to finance
-
     CustomerDetails:
       type: object
       required:
@@ -154,13 +265,25 @@ components:
         email:
           type: string
           format: email
-          example: user@example.com
+          example: "john.doe@example.com"
+          description: User's email address (used for login)
+          minLength: 5
+          maxLength: 100
         name:
           type: string
-          example: John Doe
+          example: "John Doe"
+          description: User's full name
+          minLength: 2
+          maxLength: 50
+          pattern: "^[A-Za-z\\s]+$"
+      description: Customer registration details
 
     PaymentResult:
       type: object
+      required:
+        - paymentPeriods
+        - monthlyPayments
+        - totalPayment
       properties:
         paymentPeriods:
           type: integer
@@ -170,23 +293,113 @@ components:
         monthlyPayments:
           type: number
           format: double
-          example: 87.50
-          description: Monthly payment amount
+          example: 1312.50
+          description: Monthly payment amount in ZAR
+          minimum: 0
+        totalPayment:
+          type: number
+          format: double
+          example: 15750.00
+          description: Total amount to be paid over the contract period
+          minimum: 0
+      description: Repayment calculation result for a specific term
 
     ErrorResponse:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
-          example: Error message
+          example: "Invalid amount provided"
+          description: Error description
         timestamp:
           type: string
           format: date-time
+          example: "2024-01-15T10:30:00Z"
+          description: When the error occurred
+        path:
+          type: string
+          example: "/api/v1/contracts/repayments"
+          description: Request path that caused the error
+      description: Standard error response format
+
+    CalculationRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 15000.00
+          description: Device amount to finance in ZAR
+          minimum: 100
+          maximum: 100000
+      description: Request payload for repayment calculations
 
   securitySchemes:
     basicAuth:
       type: http
       scheme: basic
+      description: HTTP Basic Authentication for API endpoints
+    
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+      description: Session-based authentication for web interface
 
-security:
-  - basicAuth: []
+  parameters:
+    AmountParameter:
+      name: amount
+      in: query
+      required: true
+      description: Device amount to finance (ZAR)
+      schema:
+        type: number
+        format: double
+        minimum: 100
+        maximum: 100000
+        example: 15000.00
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  examples:
+    SampleCalculation:
+      summary: Sample repayment calculation
+      description: Example calculation for R15,000 device
+      value:
+        - paymentPeriods: 12
+          monthlyPayments: 1312.50
+          totalPayment: 15750.00
+        - paymentPeriods: 24
+          monthlyPayments: 687.50
+          totalPayment: 16500.00
+        - paymentPeriods: 36
+          monthlyPayments: 479.17
+          totalPayment: 17250.00
+
+    SampleCustomer:
+      summary: Sample customer registration
+      description: Example customer details for registration
+      value:
+        name: "John Doe"
+        email: "john.doe@example.com"
+
+# Security is optional for most endpoints
+# Web interface uses session-based auth
+# API endpoints can use basic auth

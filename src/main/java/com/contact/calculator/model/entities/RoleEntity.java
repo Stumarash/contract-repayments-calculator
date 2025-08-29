@@ -18,12 +18,14 @@ import java.util.List;
 @Entity(name = "roles")
 public class RoleEntity extends AbstractBaseEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+	@Column(nullable = false, unique = true)
+	private String name;
 
-    @ManyToMany(mappedBy = "roles")
-    private List<CustomerDetailsEntity> user = new ArrayList<>();
+	@ManyToMany(mappedBy = "roles")
+	@Builder.Default
+	private List<CustomerDetailsEntity> user = new ArrayList<>();
+
 }

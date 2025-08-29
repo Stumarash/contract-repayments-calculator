@@ -19,45 +19,47 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CustomerManagementImpl implements CustomerManagement {
 
-    private final CustomerDetailsRepository customerDetailsRepository;
-    private final UserDetailsMapper userDetailsMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
+	private final CustomerDetailsRepository customerDetailsRepository;
 
-    @Override
-    public void registerUser(CustomerDetails customerDetails) {
-        log.info("registering customer {} on the system", customerDetails);
-        var customerDetailsEntity = userDetailsMapper.map(customerDetails);
-        customerDetailsEntity.setPassword(passwordEncoder.encode(customerDetails.getPassword()));
-        RoleEntity roleEntity = roleRepository.findByName("USER");
+	private final UserDetailsMapper userDetailsMapper;
 
-        if (Objects.isNull(roleEntity)) {
-            roleEntity = checkRoleExists();
-        }
+	private final PasswordEncoder passwordEncoder;
 
-        customerDetailsEntity.setRoles(Collections.singletonList(roleEntity));
+	private final RoleRepository roleRepository;
 
-        customerDetailsRepository.save(customerDetailsEntity);
+	@Override
+	public void registerUser(CustomerDetails customerDetails) {
+		log.info("registering customer {} on the system", customerDetails);
+		var customerDetailsEntity = userDetailsMapper.map(customerDetails);
+		customerDetailsEntity.setPassword(passwordEncoder.encode(customerDetails.getPassword()));
+		RoleEntity roleEntity = roleRepository.findByName("USER");
 
-        log.info("customer registered");
-    }
+		if (Objects.isNull(roleEntity)) {
+			roleEntity = checkRoleExists();
+		}
 
-    @Override
-    public CustomerDetails getCustomerDetails(String username) {
-        log.info("retrieve existing customer {} on the system", username);
-        CustomerDetailsEntity customerDetailsEntity = customerDetailsRepository.findByEmail(username);
-        if (Objects.isNull(customerDetailsEntity)) {
-            return CustomerDetails.builder().build();
-        }
+		customerDetailsEntity.setRoles(Collections.singletonList(roleEntity));
 
-        return userDetailsMapper.map(customerDetailsEntity);
-    }
+		customerDetailsRepository.save(customerDetailsEntity);
 
+		log.info("customer registered");
+	}
 
-    private RoleEntity checkRoleExists() {
-        RoleEntity role = new RoleEntity();
-        role.setName("USER");
-        return roleRepository.save(role);
-    }
+	@Override
+	public CustomerDetails getCustomerDetails(String username) {
+		log.info("retrieve existing customer {} on the system", username);
+		CustomerDetailsEntity customerDetailsEntity = customerDetailsRepository.findByEmail(username);
+		if (Objects.isNull(customerDetailsEntity)) {
+			return CustomerDetails.builder().build();
+		}
+
+		return userDetailsMapper.map(customerDetailsEntity);
+	}
+
+	private RoleEntity checkRoleExists() {
+		RoleEntity role = new RoleEntity();
+		role.setName("USER");
+		return roleRepository.save(role);
+	}
 
 }

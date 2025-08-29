@@ -21,34 +21,32 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CustomerAuthImplTest {
 
-    @Mock
-    private CustomerDetailsRepository customerDetailsRepository;
-    @InjectMocks
-    private CustomerAuthImpl customerAuth;
+	@Mock
+	private CustomerDetailsRepository customerDetailsRepository;
 
+	@InjectMocks
+	private CustomerAuthImpl customerAuth;
 
-    @Test
-    void loadUserByUsername() {
+	@Test
+	void loadUserByUsername() {
 
-        when(customerDetailsRepository.findByEmail(any()))
-                .thenReturn(CustomerDetailsEntity.builder()
-                        .name("name")
-                        .surname("surname")
-                        .email("email@gmail.com")
-                        .password("password")
-                        .roles(Collections.singletonList(RoleEntity.builder()
-                                .name("USER")
-                                .build()))
-                        .build());
+		when(customerDetailsRepository.findByEmail(any())).thenReturn(CustomerDetailsEntity.builder()
+			.name("name")
+			.surname("surname")
+			.email("email@gmail.com")
+			.password("password")
+			.roles(Collections.singletonList(RoleEntity.builder().name("USER").build()))
+			.build());
 
+		UserDetails userDetails = customerAuth.loadUserByUsername("email@gmail.com");
+		Assertions.assertNotNull(userDetails);
+	}
 
-        UserDetails userDetails = customerAuth.loadUserByUsername("email@gmail.com");
-        Assertions.assertNotNull(userDetails);
-    }
+	@Test
+	void testInvalidUsername() {
+		UsernameNotFoundException usernameNotFoundException = Assertions.assertThrows(UsernameNotFoundException.class,
+				() -> customerAuth.loadUserByUsername("email@gmail.com"));
+		Assertions.assertEquals("Invalid email/username or password", usernameNotFoundException.getMessage());
+	}
 
-    @Test
-    void testInvalidUsername(){
-        UsernameNotFoundException usernameNotFoundException = Assertions.assertThrows(UsernameNotFoundException.class, () -> customerAuth.loadUserByUsername("email@gmail.com"));
-        Assertions.assertEquals("Invalid email/username or password",usernameNotFoundException.getMessage());
-    }
 }

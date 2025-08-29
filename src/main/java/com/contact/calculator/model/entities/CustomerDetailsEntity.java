@@ -18,26 +18,25 @@ import java.util.List;
 @Entity(name = "user-details")
 public class CustomerDetailsEntity extends AbstractBaseEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+	@Serial
+	private static final long serialVersionUID = 1L;
 
-    @Column
-    private String name;
+	@Column
+	private String name;
 
-    @Column
-    private String surname;
+	@Column
+	private String surname;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	private String password;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	@Column(nullable = false, unique = true)
+	private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
-    )
-    private List<RoleEntity> roles = new ArrayList<>();
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name = "user_roles", joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
+			inverseJoinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "id") })
+	@Builder.Default
+	private List<RoleEntity> roles = new ArrayList<>();
+
 }

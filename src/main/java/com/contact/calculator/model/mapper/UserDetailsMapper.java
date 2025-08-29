@@ -7,17 +7,15 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(
-        builder = @Builder(disableBuilder = true),
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR
-)
+@Mapper(builder = @Builder(disableBuilder = true), componentModel = "spring",
+		injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserDetailsMapper {
 
-    @Mapping(source = "created", target = "created")
-    CustomerDetailsEntity map(CustomerDetails customerDetails);
+	@Mapping(target = "roles", ignore = true)
+	@Mapping(source = "created", target = "created")
+	CustomerDetailsEntity map(CustomerDetails customerDetails);
 
-    @Mapping(source = "created", target = "created")
-    CustomerDetails map(CustomerDetailsEntity customerDetailsEntity);
+	@Mapping(source = "created", target = "created")
+	CustomerDetails map(CustomerDetailsEntity customerDetailsEntity);
 
 }

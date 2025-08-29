@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceDetails {
-    @Positive(message = "Amount must be greater than zero")
-    private double amount;
+
+	@Positive(message = "Amount must be greater than zero")
+	private double amount;
+
 }

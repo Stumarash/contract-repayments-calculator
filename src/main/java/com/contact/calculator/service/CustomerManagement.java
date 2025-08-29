@@ -4,7 +4,8 @@ import com.contact.calculator.model.domain.CustomerDetails;
 
 public interface CustomerManagement {
 
-    void registerUser(CustomerDetails customerDetails);
+	void registerUser(CustomerDetails customerDetails);
 
-    CustomerDetails getCustomerDetails(String username);
+	CustomerDetails getCustomerDetails(String username);
+
 }
