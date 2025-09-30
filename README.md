@@ -16,22 +16,22 @@
 
 | Technology | Version | Purpose |
 |------------|---------|----------|
-| **Java** | 21 | Runtime environment |
-| **Spring Boot** | 3.3.1 | Application framework |
+| **Java** | 23 | Runtime environment |
+| **Spring Boot** | 3.4.1 | Application framework |
 | **Spring Security** | 6.x | Authentication & authorization |
 | **Thymeleaf** | 3.x | Template engine |
 | **H2 Database** | 2.x | In-memory database |
 | **Maven** | 3.x | Build tool |
 | **JUnit** | 5.x | Testing framework |
 | **Lombok** | Latest | Code generation |
-| **MapStruct** | 1.5.5.Final | Object mapping |
+| **MapStruct** | 1.6.3 | Object mapping |
 | **Bootstrap** | 5.3.2 | UI framework |
-| **Spring Java Format** | 0.0.42 | Code formatting |
+| **Spring Java Format** | 0.0.43 | Code formatting |
 
 ## 🏃‍♂️ Quick Start
 
 ### Prerequisites
-- **Java 21** or higher
+- **Java 23** or higher
 - **Maven 3.6+** (or use included wrapper)
 - **Git** for cloning
 
@@ -42,7 +42,7 @@ git clone https://github.com/Stumarash/contract-repayments-calculator.git
 cd contract-repayments-calculator
 
 # Verify Java version
-java -version  # Should show Java 21+
+java -version  # Should show Java 23+
 ```
 
 ### 2️⃣ Build & Run
@@ -108,7 +108,7 @@ open target/site/jacoco/index.html
 ### IDE Setup
 1. **Enable Lombok**: Install Lombok plugin in your IDE
 2. **Enable Annotation Processing**: Required for Lombok and MapStruct
-3. **Java 21**: Configure project SDK
+3. **Java 23**: Configure project SDK
 
 ### Code Formatting
 ```bash

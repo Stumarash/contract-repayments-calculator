@@ -38,7 +38,7 @@ resources:
 
 springBoot:
   profile: prod
-  javaOpts: -Xmx512m -Xms256m
+  javaOpts: -Xmx768m -Xms512m
 
 h2Database:
   enabled: true
@@ -49,4 +49,3 @@ h2Database:
   config:
     dbName: repaymentdb
     username: sa
-    password: password
